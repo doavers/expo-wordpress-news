@@ -1,7 +1,7 @@
 {
   "name": "expo-starter-app",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "index.tsx",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -9,10 +9,22 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-google-signin/google-signin": "^16.0.0",
+    "@react-navigation/native": "^7.1.18",
     "expo": "~54.0.20",
+    "expo-auth-session": "^7.0.8",
+    "expo-constants": "^18.0.10",
+    "expo-crypto": "^15.0.7",
+    "expo-linking": "^8.0.8",
+    "expo-localization": "^17.0.7",
+    "expo-router": "^6.0.13",
     "expo-status-bar": "~3.0.8",
+    "expo-symbols": "^1.0.7",
     "react": "19.1.0",
-    "react-native": "0.81.5"
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "^5.6.1",
+    "react-native-screens": "~4.16.0"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
