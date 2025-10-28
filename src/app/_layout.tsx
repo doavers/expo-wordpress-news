@@ -29,25 +29,11 @@ export default function RootLayout() {
   return (
     <AppProvider>
       <StatusBar style='auto' />
-      <Stack>
-        <Stack.Screen name='index' options={{ title: "Home" }} />
-        <Stack.Screen name='about' options={{ title: "About" }} />
-        <Stack.Screen name='settings' options={{ title: "Settings" }} />
-        <Stack.Screen
-          name='profile'
-          options={{ title: "Profile", headerBackVisible: false }}
-          redirect={!authState.isAuthenticated}
-        />
-        <Stack.Screen
-          name='login'
-          options={{ title: "Login", headerBackVisible: false }}
-          redirect={authState.isAuthenticated}
-        />
-        <Stack.Screen
-          name='register'
-          options={{ title: "Register", headerBackVisible: false }}
-          redirect={authState.isAuthenticated}
-        />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(protected)" options={{ headerShown: false }} />
+        <Stack.Screen name="about" options={{ headerShown: false }} />
       </Stack>
     </AppProvider>
   );
