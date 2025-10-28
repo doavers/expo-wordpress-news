@@ -14,10 +14,13 @@ import i18nService from "@/services/i18n";
 import authService from "@/services/auth";
 import { Theme } from "@/types/theme";
 import { AuthState } from "@/types/auth";
+import { resetFirstLaunch } from "@/utils/welcomeUtils";
 
 export default function SettingsPage() {
   const { themeState, setTheme, setLanguage, language } = useAppContext();
-  const [availableLanguages, setAvailableLanguages] = useState(i18nService.getAvailableLanguages());
+  const [availableLanguages, setAvailableLanguages] = useState(
+    i18nService.getAvailableLanguages()
+  );
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     token: null,
@@ -86,6 +89,32 @@ export default function SettingsPage() {
 
   const handleAbout = () => {
     router.push("/about");
+  };
+
+  const resetWelcomeScreen = () => {
+    Alert.alert(
+      "Reset Welcome Screen",
+      "This will show the welcome screen again on next app launch. Continue?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Reset",
+          style: "default",
+          onPress: async () => {
+            try {
+              await resetFirstLaunch();
+              Alert.alert(
+                "Success",
+                "Welcome screen will appear on next app launch"
+              );
+            } catch (error) {
+              console.error("Error resetting welcome screen:", error);
+              Alert.alert("Error", "Failed to reset welcome screen");
+            }
+          },
+        },
+      ]
+    );
   };
 
   const getThemeButtonStyle = (selectedTheme: Theme) => {
@@ -239,8 +268,18 @@ export default function SettingsPage() {
               {i18nService.t("navigation.aboutNewsHub")}
             </ThemedText>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.optionButton}
+            onPress={resetWelcomeScreen}
+          >
+            <ThemedText style={styles.optionButtonText}>
+              Reset Welcome Screen
+            </ThemedText>
+          </TouchableOpacity>
           <View style={styles.appInfo}>
-            <ThemedText style={styles.appInfoText}>{i18nService.t("settings.version")}: 1.0.0</ThemedText>
+            <ThemedText style={styles.appInfoText}>
+              {i18nService.t("settings.version")}: 1.0.0
+            </ThemedText>
             <ThemedText style={styles.appInfoText}>
               {i18nService.t("settings.source")}: blog.doavers.com
             </ThemedText>

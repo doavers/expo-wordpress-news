@@ -77,7 +77,7 @@ export default function HomePage() {
         wordpressApiService.getFeaturedPosts(5),
         wordpressApiService.getLatestPosts(10, 1),
       ]);
-      console.log("Fetched featured posts:", featuredData);
+      // console.log("Fetched featured posts:", featuredData);
       setFeaturedPosts(featuredData);
       setLatestPosts(latestData);
       await loadBookmarks();

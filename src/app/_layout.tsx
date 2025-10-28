@@ -15,6 +15,7 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    // Initialize auth state
     const unsubscribe = authService.subscribe((state) => {
       setAuthState(state);
     });
@@ -26,14 +27,16 @@ export default function RootLayout() {
     return null; // Or a loading screen
   }
 
+  // Regular app navigation with all routes
   return (
     <AppProvider>
       <StatusBar style='auto' />
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(protected)" options={{ headerShown: false }} />
-        <Stack.Screen name="about" options={{ headerShown: false }} />
+        <Stack.Screen name='index' options={{ headerShown: false }} />
+        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+        <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+        <Stack.Screen name='(protected)' options={{ headerShown: false }} />
+        <Stack.Screen name='about' options={{ headerShown: false }} />
       </Stack>
     </AppProvider>
   );
