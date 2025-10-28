@@ -91,6 +91,10 @@ export default function LoginPage() {
     router.push("/register");
   };
 
+  const handleSkipToHome = () => {
+    router.replace("/");
+  };
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
@@ -131,12 +135,12 @@ export default function LoginPage() {
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <ThemedText style={styles.dividerText}>OR</ThemedText>
+            <ThemedText style={styles.dividerText}>{i18nService.t("auth.or")}</ThemedText>
             <View style={styles.dividerLine} />
           </View>
 
           <GoogleButton
-            title='Continue with Google'
+            title={i18nService.t("auth.continueWithGoogle")}
             onPress={handleGoogleLogin}
             loading={googleLoading}
             style={styles.googleButton}
@@ -151,6 +155,15 @@ export default function LoginPage() {
               onPress={handleRegister}
               variant='secondary'
               style={styles.registerButton}
+            />
+          </View>
+
+          <View style={styles.skipContainer}>
+            <Button
+              title={i18nService.t("auth.skipToHome")}
+              onPress={handleSkipToHome}
+              variant="outline"
+              style={styles.skipButton}
             />
           </View>
         </View>
@@ -209,5 +222,12 @@ const styles = StyleSheet.create({
   },
   registerButton: {
     paddingHorizontal: 24,
+  },
+  skipContainer: {
+    alignItems: "center",
+    marginTop: 24,
+  },
+  skipButton: {
+    paddingHorizontal: 32,
   },
 });

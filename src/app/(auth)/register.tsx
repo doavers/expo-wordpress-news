@@ -58,6 +58,10 @@ export default function RegisterPage() {
     router.push("/login");
   };
 
+  const handleSkipToHome = () => {
+    router.replace("/");
+  };
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
@@ -116,6 +120,15 @@ export default function RegisterPage() {
               style={styles.loginButton}
             />
           </View>
+
+          <View style={styles.skipContainer}>
+            <Button
+              title={i18nService.t("auth.skipToHome")}
+              onPress={handleSkipToHome}
+              variant="outline"
+              style={styles.skipButton}
+            />
+          </View>
         </View>
       </View>
     </ThemedView>
@@ -154,5 +167,12 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     paddingHorizontal: 24,
+  },
+  skipContainer: {
+    alignItems: "center",
+    marginTop: 24,
+  },
+  skipButton: {
+    paddingHorizontal: 32,
   },
 });
