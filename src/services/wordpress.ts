@@ -30,37 +30,37 @@ class WordPressApiService {
 
   private getBaseUrlByLanguage(): string {
     const currentLanguage = i18nService.getCurrentLanguage();
-    console.log("WordPressApiService: Current language:", currentLanguage);
+    // console.log("WordPressApiService: Current language:", currentLanguage);
 
     if (currentLanguage === "id") {
-      console.log("WordPressApiService: Using Indonesian URL:", DEFAULT_ID_URL);
+      // console.log("WordPressApiService: Using Indonesian URL:", DEFAULT_ID_URL);
       return DEFAULT_ID_URL;
     } else {
-      console.log("WordPressApiService: Using English URL:", DEFAULT_EN_URL);
+      // console.log("WordPressApiService: Using English URL:", DEFAULT_EN_URL);
       return DEFAULT_EN_URL;
     }
   }
 
   private getFeaturedCategoryIdByLanguage(): string {
     const currentLanguage = i18nService.getCurrentLanguage();
-    console.log(
-      "WordPressApiService: Getting featured category ID for language:",
-      currentLanguage
-    );
+    // console.log(
+    //   "WordPressApiService: Getting featured category ID for language:",
+    //   currentLanguage
+    // );
 
     if (currentLanguage === "id") {
       const categoryId = DEFAULT_ID_FEATURED_CATEGORY_ID;
-      console.log(
-        "WordPressApiService: Using Indonesian featured category ID:",
-        categoryId
-      );
+      // console.log(
+      //   "WordPressApiService: Using Indonesian featured category ID:",
+      //   categoryId
+      // );
       return categoryId;
     } else {
       const categoryId = DEFAULT_EN_FEATURED_CATEGORY_ID;
-      console.log(
-        "WordPressApiService: Using English featured category ID:",
-        categoryId
-      );
+      // console.log(
+      //   "WordPressApiService: Using English featured category ID:",
+      //   categoryId
+      // );
       return categoryId;
     }
   }
@@ -68,12 +68,12 @@ class WordPressApiService {
   updateBaseUrl() {
     const newBaseUrl = this.getBaseUrlByLanguage();
     if (newBaseUrl !== this.currentBaseUrl) {
-      console.log(
-        "WordPressApiService: Updating base URL from",
-        this.currentBaseUrl,
-        "to",
-        newBaseUrl
-      );
+      // console.log(
+      //   "WordPressApiService: Updating base URL from",
+      //   this.currentBaseUrl,
+      //   "to",
+      //   newBaseUrl
+      // );
       this.currentBaseUrl = newBaseUrl;
       this.api.defaults.baseURL = newBaseUrl;
     }
@@ -136,11 +136,11 @@ class WordPressApiService {
         this.getFeaturedCategoryIdByLanguage()
       );
 
-      console.log("WordPressApiService.getFeaturedPosts called", {
-        categoryId: featuredCategoryId,
-        limit,
-        language: i18nService.getCurrentLanguage(),
-      });
+      // console.log("WordPressApiService.getFeaturedPosts called", {
+      //   categoryId: featuredCategoryId,
+      //   limit,
+      //   language: i18nService.getCurrentLanguage(),
+      // });
 
       const response = await this.api
         .get("/posts", {
@@ -159,7 +159,7 @@ class WordPressApiService {
 
       return response.data.map((post: any) => {
         const tfPost = this.transformPost(post);
-        console.log("Transformed featured post:", tfPost);
+        // console.log("Transformed featured post:", tfPost);
         return tfPost;
       });
     } catch (error) {
