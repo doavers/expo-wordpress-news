@@ -226,7 +226,8 @@ class WordPressApiService {
       const response = await this.api.get("/posts", {
         params: {
           _embed: true,
-          search: query,
+          subtype: "post",
+          search: decodeURIComponent(query),
           per_page: perPage,
           page: page,
           order: "desc",

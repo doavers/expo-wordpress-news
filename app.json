@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-starter-app",
-    "slug": "expo-starter-app",
+    "name": "expo-wordpress-news-hub",
+    "slug": "expo-wordpress-news-hub",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -29,7 +29,7 @@
     "plugins": [
       "expo-router"
     ],
-    "scheme": "expo-starter-app",
+    "scheme": "expo-wordpress-news-hub",
     "experiments": {
       "typedRoutes": true
     }
