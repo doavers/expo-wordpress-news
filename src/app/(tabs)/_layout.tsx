@@ -9,6 +9,7 @@ export default function TabLayout() {
   const { themeState } = useAppContext();
   const [tabTitles, setTabTitles] = useState({
     home: i18nService.t('navigation.home'),
+    search: i18nService.t('search.title'),
     categories: i18nService.t('navigation.categories'),
     bookmarks: i18nService.t('bookmarks.title'),
     settings: i18nService.t('navigation.settings'),
@@ -19,6 +20,7 @@ export default function TabLayout() {
     const unsubscribe = i18nService.subscribe(() => {
       setTabTitles({
         home: i18nService.t('navigation.home'),
+        search: i18nService.t('search.title'),
         categories: i18nService.t('navigation.categories'),
         bookmarks: i18nService.t('bookmarks.title'),
         settings: i18nService.t('navigation.settings'),
@@ -46,6 +48,15 @@ export default function TabLayout() {
           title: tabTitles.home,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: tabTitles.search,
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'search' : 'search-outline'} size={24} color={color} />
           ),
         }}
       />

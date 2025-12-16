@@ -326,7 +326,7 @@ export default function SettingsPage() {
             </ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.optionButton}
+            style={[styles.optionButton, styles.resetButton]}
             onPress={resetWelcomeScreen}
           >
             <ThemedText style={styles.optionButtonText}>

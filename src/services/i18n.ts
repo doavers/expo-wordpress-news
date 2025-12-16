@@ -61,7 +61,14 @@ export type TranslationKey =
   | "about.description"
   | "categories.backToCategories"
   | "bookmarks.clearAll"
-  | "navigation.aboutNewsHub";
+  | "navigation.aboutNewsHub"
+  | "search.title"
+  | "search.placeholder"
+  | "search.searchButton"
+  | "search.clearButton"
+  | "search.noResults"
+  | "search.loading"
+  | "search.error";
 
 const LANGUAGE_KEY = "app_language";
 
@@ -130,6 +137,13 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     "categories.backToCategories": "Back to Categories",
     "bookmarks.clearAll": "Clear All Bookmarks",
     "navigation.aboutNewsHub": "About News Hub",
+    "search.title": "Search",
+    "search.placeholder": "Search news...",
+    "search.searchButton": "Search",
+    "search.clearButton": "Clear",
+    "search.noResults": "No results found",
+    "search.loading": "Searching...",
+    "search.error": "Error searching. Please try again.",
   },
   id: {
     "common.ok": "OK",
@@ -193,6 +207,13 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     "categories.backToCategories": "Kembali ke Kategori",
     "bookmarks.clearAll": "Hapus Semua Bookmark",
     "navigation.aboutNewsHub": "Tentang Pusat Berita",
+    "search.title": "Cari",
+    "search.placeholder": "Cari berita...",
+    "search.searchButton": "Cari",
+    "search.clearButton": "Hapus",
+    "search.noResults": "Tidak ada hasil ditemukan",
+    "search.loading": "Mencari...",
+    "search.error": "Error saat mencari. Silakan coba lagi.",
   },
 };
 
