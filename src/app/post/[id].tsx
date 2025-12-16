@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
 import { Image } from "expo-image";
-import { ThemedText, ThemedView } from "@/components";
+import { ThemedText, ThemedView, HTMLRenderer } from "@/components";
 import { BookmarkButton, ShareButton } from "@/components/blog";
 import { wordpressApiService, bookmarkService } from "@/services";
 import { Post, Bookmark } from "@/types";
@@ -351,11 +351,10 @@ export default function PostDetailPage() {
 
           {/* Content */}
           <View style={styles.postContent}>
-            <ThemedText style={styles.contentText}>
-              {(post?.content?.rendered ?? "")
-                .replace(/<[^>]*>/g, "")
-                .replace(/&nbsp;/g, " ")}
-            </ThemedText>
+            <HTMLRenderer
+              htmlContent={post?.content?.rendered ?? ""}
+              style={styles.contentText}
+            />
           </View>
 
           {/* Action buttons */}

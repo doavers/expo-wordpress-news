@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { Image } from "expo-image";
+import { Ionicons } from "@expo/vector-icons";
 import Carousel from "react-native-reanimated-carousel";
 import { ThemedText, ThemedView } from "@/components";
 import { BlogList } from "@/components/blog";
@@ -118,6 +119,10 @@ export default function HomePage() {
       pathname: "/post/[id]",
       params: { id: post.id.toString() },
     });
+  };
+
+  const handleNotificationPress = () => {
+    router.push("/notifications/history");
   };
 
   const renderFeaturedCarousel = () => {
@@ -237,6 +242,16 @@ export default function HomePage() {
           <ThemedText variant='primary' style={styles.headerTitle}>
             {i18nService.t("news.title") || "News Hub"}
           </ThemedText>
+          <TouchableOpacity
+            style={styles.notificationButton}
+            onPress={handleNotificationPress}
+          >
+            <Ionicons
+              name="notifications-outline"
+              size={24}
+              color={themeState.colors.text}
+            />
+          </TouchableOpacity>
         </View>
 
         {renderFeaturedCarousel()}
@@ -255,14 +270,23 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
     marginTop: 10,
     marginBottom: 30,
+    paddingHorizontal: 10,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
+    flex: 1,
+  },
+  notificationButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "rgba(0,0,0,0.05)",
   },
   sectionTitle: {
     fontSize: 20,

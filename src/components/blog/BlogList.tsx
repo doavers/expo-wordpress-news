@@ -19,8 +19,16 @@ interface BlogListProps {
   onPostPress: (post: Post) => void;
   onBookmarkPress: (post: Post) => void;
   showBookmark?: boolean;
-  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
-  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
+  ListEmptyComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
   contentContainerStyle?: any;
   useFlatList?: boolean; // New prop to control whether to use FlatList
 }
@@ -52,7 +60,7 @@ export default function BlogList({
   if (loading && posts.length === 0) {
     return (
       <ThemedView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size='large' color='#007AFF' />
         <ThemedText style={styles.loadingText}>Loading posts...</ThemedText>
       </ThemedView>
     );
@@ -60,19 +68,21 @@ export default function BlogList({
 
   const renderPostList = () => {
     if (posts.length === 0) {
-      return ListEmptyComponent ? <ListEmptyComponent /> : (
+      return ListEmptyComponent ? (
+        React.isValidElement(ListEmptyComponent) ? (
+          ListEmptyComponent
+        ) : (
+          React.createElement(ListEmptyComponent as React.ComponentType<any>)
+        )
+      ) : (
         <ThemedView style={styles.emptyContainer}>
-          <ThemedText style={styles.emptyText}>
-            No posts available
-          </ThemedText>
+          <ThemedText style={styles.emptyText}>No posts available</ThemedText>
         </ThemedView>
       );
     }
 
     return posts.map((post) => (
-      <View key={post.id}>
-        {renderPostItem({ item: post })}
-      </View>
+      <View key={post.id}>{renderPostItem({ item: post })}</View>
     ));
   };
 
@@ -83,10 +93,7 @@ export default function BlogList({
           data={posts}
           renderItem={renderPostItem}
           keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={[
-            styles.listContent,
-            contentContainerStyle,
-          ]}
+          contentContainerStyle={[styles.listContent, contentContainerStyle]}
           showsVerticalScrollIndicator={false}
           refreshControl={
             onRefresh ? (
@@ -103,7 +110,12 @@ export default function BlogList({
   // Non-FlatList version (for use inside ScrollView)
   return (
     <View style={[styles.container, contentContainerStyle]}>
-      {ListHeaderComponent && <ListHeaderComponent />}
+      {ListHeaderComponent &&
+        (React.isValidElement(ListHeaderComponent)
+          ? ListHeaderComponent
+          : React.createElement(
+              ListHeaderComponent as React.ComponentType<any>
+            ))}
       {renderPostList()}
     </View>
   );
