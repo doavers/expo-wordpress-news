@@ -1,13 +1,24 @@
-import React from 'react';
-import { TextInput as RNTextInput, TextInputProps, StyleSheet, View } from 'react-native';
-import { useAppContext } from '@/contexts/AppContext';
+import React from "react";
+import {
+  TextInput as RNTextInput,
+  TextInputProps,
+  StyleSheet,
+  View,
+} from "react-native";
+import { useAppContext } from "@/contexts/AppContext";
+import { ThemedText } from "./ThemedText";
 
 interface ThemedTextInputProps extends TextInputProps {
   label?: string;
   error?: string;
 }
 
-export function ThemedTextInput({ label, error, style, ...props }: ThemedTextInputProps) {
+export function ThemedTextInput({
+  label,
+  error,
+  style,
+  ...props
+}: ThemedTextInputProps) {
   const { themeState } = useAppContext();
 
   const inputStyle = [
@@ -29,7 +40,11 @@ export function ThemedTextInput({ label, error, style, ...props }: ThemedTextInp
         placeholderTextColor={themeState.colors.textSecondary}
         {...props}
       />
-      {error && <ThemedText style={[styles.error, { color: themeState.colors.error }]}>{error}</ThemedText>}
+      {error && (
+        <ThemedText style={[styles.error, { color: themeState.colors.error }]}>
+          {error}
+        </ThemedText>
+      )}
     </View>
   );
 }
@@ -41,7 +56,7 @@ const styles = StyleSheet.create({
   label: {
     marginBottom: 8,
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   input: {
     paddingHorizontal: 12,
@@ -55,5 +70,3 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
-
-import { ThemedText } from './ThemedText';

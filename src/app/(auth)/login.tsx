@@ -3,7 +3,7 @@ import { View, StyleSheet, Alert } from "react-native";
 import { router } from "expo-router";
 import { ThemedText, ThemedView } from "@/components";
 import { Button } from "@/components/Button";
-import { ThemedTextInput } from "@/components/TextInput";
+import { ThemedTextInput } from "@/components/ThemedTextInput";
 import { GoogleButton } from "@/components/GoogleButton";
 import authService from "@/services/auth";
 import googleAuthService from "@/services/googleAuth";
@@ -135,7 +135,9 @@ export default function LoginPage() {
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <ThemedText style={styles.dividerText}>{i18nService.t("auth.or")}</ThemedText>
+            <ThemedText style={styles.dividerText}>
+              {i18nService.t("auth.or")}
+            </ThemedText>
             <View style={styles.dividerLine} />
           </View>
 
@@ -162,7 +164,7 @@ export default function LoginPage() {
             <Button
               title={i18nService.t("auth.skipToHome")}
               onPress={handleSkipToHome}
-              variant="outline"
+              variant='outline'
               style={styles.skipButton}
             />
           </View>

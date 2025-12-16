@@ -3,7 +3,7 @@ import { View, StyleSheet, Alert } from "react-native";
 import { router } from "expo-router";
 import { ThemedText, ThemedView } from "@/components";
 import { Button } from "@/components/Button";
-import { ThemedTextInput } from "@/components/TextInput";
+import { ThemedTextInput } from "@/components/ThemedTextInput";
 import authService from "@/services/auth";
 import i18nService from "@/services/i18n";
 import { RegisterCredentials } from "@/types/auth";
@@ -125,7 +125,7 @@ export default function RegisterPage() {
             <Button
               title={i18nService.t("auth.skipToHome")}
               onPress={handleSkipToHome}
-              variant="outline"
+              variant='outline'
               style={styles.skipButton}
             />
           </View>
