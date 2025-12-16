@@ -9,12 +9,15 @@ import {
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { Image } from "expo-image";
+import { Ionicons } from "@expo/vector-icons";
 import { ThemedText, ThemedView } from "@/components";
 import { Post, Bookmark } from "@/types";
 import { bookmarkService } from "@/services";
 import i18nService from "@/services/i18n";
+import { useAppContext } from "@/contexts/AppContext";
 
 export default function BookmarksPage() {
+  const { themeState } = useAppContext();
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -99,6 +102,10 @@ export default function BookmarksPage() {
     });
   };
 
+  const handleNotificationPress = () => {
+    router.push("/notifications/history");
+  };
+
   const renderBookmarkItem = (bookmark: Bookmark) => (
     <View key={bookmark.id} style={styles.bookmarkItem}>
       <TouchableOpacity
@@ -163,13 +170,25 @@ export default function BookmarksPage() {
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <ThemedText variant='primary' style={styles.headerTitle}>
-            {i18nService.t("bookmarks.title") || "Bookmarks"}
-          </ThemedText>
-          <ThemedText style={styles.headerSubtitle}>
-            {bookmarks.length}{" "}
-            {bookmarks.length === 1 ? "bookmark" : "bookmarks"}
-          </ThemedText>
+          <View style={styles.headerTextContainer}>
+            <ThemedText variant='primary' style={styles.headerTitle}>
+              {i18nService.t("bookmarks.title") || "Bookmarks"}
+            </ThemedText>
+            <ThemedText style={styles.headerSubtitle}>
+              {bookmarks.length}{" "}
+              {bookmarks.length === 1 ? "bookmark" : "bookmarks"}
+            </ThemedText>
+          </View>
+          <TouchableOpacity
+            style={styles.notificationButton}
+            onPress={handleNotificationPress}
+          >
+            <Ionicons
+              name="notifications-outline"
+              size={24}
+              color={themeState.colors.text}
+            />
+          </TouchableOpacity>
         </View>
 
         {bookmarks.length === 0 ? (
@@ -219,9 +238,16 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
     marginTop: 10,
     marginBottom: 30,
+    paddingHorizontal: 10,
+  },
+  headerTextContainer: {
+    alignItems: "center",
+    flex: 1,
   },
   headerTitle: {
     fontSize: 28,
@@ -232,6 +258,11 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 16,
     opacity: 0.6,
+  },
+  notificationButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "rgba(0,0,0,0.05)",
   },
   bookmarksContainer: {
     flex: 1,
