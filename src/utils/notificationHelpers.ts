@@ -1,12 +1,21 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
-import { NOTIFICATION_KEYS, NOTIFICATION_LIMITS, NOTIFICATION_ERRORS } from '@/constants/notifications';
-import { NotificationData, NotificationHistory, ScheduledNotification, NotificationValidationResult } from '@/types/notifications';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+import {
+  NOTIFICATION_KEYS,
+  NOTIFICATION_LIMITS,
+  NOTIFICATION_ERRORS,
+} from "@/constants/notifications";
+import {
+  NotificationData,
+  NotificationHistory,
+  ScheduledNotification,
+  NotificationValidationResult,
+} from "@/types/notifications";
 
 // Time and scheduling helpers
 export const parseTimeToMinutes = (timeStr: string): number => {
-  const [hours, minutes] = timeStr.split(':').map(Number);
+  const [hours, minutes] = timeStr.split(":").map(Number);
   return hours * 60 + minutes;
 };
 
@@ -32,10 +41,13 @@ export const isWeekend = (date: Date): boolean => {
   return day === 0 || day === 6; // Sunday or Saturday
 };
 
-export const createDailyTrigger = (hour: number, minute: number = 0): Notifications.DailyTriggerInput => ({
+export const createDailyTrigger = (
+  hour: number,
+  minute: number = 0
+): Notifications.DailyTriggerInput => ({
+  type: Notifications.SchedulableTriggerInputTypes.DAILY,
   hour,
   minute,
-  repeats: true,
 });
 
 export const createWeeklyTrigger = (
@@ -43,13 +55,16 @@ export const createWeeklyTrigger = (
   hour: number,
   minute: number = 0
 ): Notifications.WeeklyTriggerInput => ({
+  type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
   weekday,
   hour,
   minute,
-  repeats: true,
 });
 
-export const createIntervalTrigger = (seconds: number): Notifications.IntervalTriggerInput => ({
+export const createIntervalTrigger = (
+  seconds: number
+): Notifications.TimeIntervalTriggerInput => ({
+  type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
   seconds,
   repeats: true,
 });
@@ -57,7 +72,7 @@ export const createIntervalTrigger = (seconds: number): Notifications.IntervalTr
 // Notification content helpers
 export const truncateText = (text: string, maxLength: number): string => {
   if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength - 3) + '...';
+  return text.substring(0, maxLength - 3) + "...";
 };
 
 export const formatNotificationTitle = (title: string): string => {
@@ -105,7 +120,7 @@ export const storage = {
       await AsyncStorage.multiRemove(keys);
       return true;
     } catch (error) {
-      console.error(`Error clearing items ${keys.join(', ')}:`, error);
+      console.error(`Error clearing items ${keys.join(", ")}:`, error);
       return false;
     }
   },
@@ -121,36 +136,46 @@ export const validateNotificationContent = (
   const warnings: string[] = [];
 
   if (!title || title.trim().length === 0) {
-    errors.push('Notification title is required');
+    errors.push("Notification title is required");
   }
 
   if (!body || body.trim().length === 0) {
-    errors.push('Notification body is required');
+    errors.push("Notification body is required");
   }
 
   if (title.length > NOTIFICATION_LIMITS.MAX_TITLE_LENGTH) {
-    errors.push(`Title exceeds maximum length of ${NOTIFICATION_LIMITS.MAX_TITLE_LENGTH} characters`);
+    errors.push(
+      `Title exceeds maximum length of ${NOTIFICATION_LIMITS.MAX_TITLE_LENGTH} characters`
+    );
   }
 
   if (body.length > NOTIFICATION_LIMITS.MAX_BODY_LENGTH) {
-    errors.push(`Body exceeds maximum length of ${NOTIFICATION_LIMITS.MAX_BODY_LENGTH} characters`);
+    errors.push(
+      `Body exceeds maximum length of ${NOTIFICATION_LIMITS.MAX_BODY_LENGTH} characters`
+    );
   }
 
-  if (data.customData && JSON.stringify(data.customData).length > NOTIFICATION_LIMITS.MAX_CUSTOM_DATA_SIZE) {
-    errors.push(`Custom data exceeds maximum size of ${NOTIFICATION_LIMITS.MAX_CUSTOM_DATA_SIZE} bytes`);
+  if (
+    data.customData &&
+    JSON.stringify(data.customData).length >
+      NOTIFICATION_LIMITS.MAX_CUSTOM_DATA_SIZE
+  ) {
+    errors.push(
+      `Custom data exceeds maximum size of ${NOTIFICATION_LIMITS.MAX_CUSTOM_DATA_SIZE} bytes`
+    );
   }
 
   // Add warnings for best practices
   if (title.length > 50) {
-    warnings.push('Long titles may be truncated on some devices');
+    warnings.push("Long titles may be truncated on some devices");
   }
 
   if (body.length > 150) {
-    warnings.push('Long bodies may be truncated on some devices');
+    warnings.push("Long bodies may be truncated on some devices");
   }
 
   if (!data.type) {
-    errors.push('Notification type is required');
+    errors.push("Notification type is required");
   }
 
   return {
@@ -165,17 +190,35 @@ export const addToNotificationHistory = async (
   notification: Notifications.Notification
 ): Promise<boolean> => {
   try {
-    const history = await storage.get<NotificationHistory[]>(NOTIFICATION_KEYS.NOTIFICATION_HISTORY) || [];
+    const history =
+      (await storage.get<NotificationHistory[]>(
+        NOTIFICATION_KEYS.NOTIFICATION_HISTORY
+      )) || [];
+
+    // Safely convert notification data to NotificationData with fallback
+    const rawData = notification.request.content.data as Record<
+      string,
+      unknown
+    >;
+    const safeData: NotificationData = {
+      type: (rawData.type as NotificationData["type"]) || "custom",
+      postId: rawData.postId as string,
+      categoryId: rawData.categoryId as string,
+      authorId: rawData.authorId as string,
+      priority: rawData.priority as NotificationData["priority"],
+      imageUrl: rawData.imageUrl as string,
+      url: rawData.url as string,
+      customData: rawData.customData as Record<string, any>,
+    };
 
     const historyItem: NotificationHistory = {
       id: notification.request.identifier,
-      title: notification.request.content.title || '',
-      body: notification.request.content.body || '',
-      data: notification.request.content.data as NotificationData,
+      title: notification.request.content.title || "",
+      body: notification.request.content.body || "",
+      data: safeData,
       receivedAt: new Date(),
       read: false,
       interacted: false,
-      channelId: notification.request.content.channelId,
     };
 
     // Add new item to the beginning
@@ -186,44 +229,65 @@ export const addToNotificationHistory = async (
       updatedHistory.splice(NOTIFICATION_LIMITS.MAX_NOTIFICATION_HISTORY);
     }
 
-    return await storage.set(NOTIFICATION_KEYS.NOTIFICATION_HISTORY, updatedHistory);
+    return await storage.set(
+      NOTIFICATION_KEYS.NOTIFICATION_HISTORY,
+      updatedHistory
+    );
   } catch (error) {
-    console.error('Error adding to notification history:', error);
+    console.error("Error adding to notification history:", error);
     return false;
   }
 };
 
-export const getNotificationHistory = async (): Promise<NotificationHistory[]> => {
+export const getNotificationHistory = async (): Promise<
+  NotificationHistory[]
+> => {
   try {
-    return await storage.get<NotificationHistory[]>(NOTIFICATION_KEYS.NOTIFICATION_HISTORY) || [];
+    return (
+      (await storage.get<NotificationHistory[]>(
+        NOTIFICATION_KEYS.NOTIFICATION_HISTORY
+      )) || []
+    );
   } catch (error) {
-    console.error('Error getting notification history:', error);
+    console.error("Error getting notification history:", error);
     return [];
   }
 };
 
-export const markNotificationAsRead = async (notificationId: string): Promise<boolean> => {
+export const markNotificationAsRead = async (
+  notificationId: string
+): Promise<boolean> => {
   try {
     const history = await getNotificationHistory();
-    const updatedHistory = history.map(item =>
+    const updatedHistory = history.map((item) =>
       item.id === notificationId ? { ...item, read: true } : item
     );
-    return await storage.set(NOTIFICATION_KEYS.NOTIFICATION_HISTORY, updatedHistory);
+    return await storage.set(
+      NOTIFICATION_KEYS.NOTIFICATION_HISTORY,
+      updatedHistory
+    );
   } catch (error) {
-    console.error('Error marking notification as read:', error);
+    console.error("Error marking notification as read:", error);
     return false;
   }
 };
 
-export const markNotificationAsInteracted = async (notificationId: string): Promise<boolean> => {
+export const markNotificationAsInteracted = async (
+  notificationId: string
+): Promise<boolean> => {
   try {
     const history = await getNotificationHistory();
-    const updatedHistory = history.map(item =>
-      item.id === notificationId ? { ...item, read: true, interacted: true } : item
+    const updatedHistory = history.map((item) =>
+      item.id === notificationId
+        ? { ...item, read: true, interacted: true }
+        : item
     );
-    return await storage.set(NOTIFICATION_KEYS.NOTIFICATION_HISTORY, updatedHistory);
+    return await storage.set(
+      NOTIFICATION_KEYS.NOTIFICATION_HISTORY,
+      updatedHistory
+    );
   } catch (error) {
-    console.error('Error marking notification as interacted:', error);
+    console.error("Error marking notification as interacted:", error);
     return false;
   }
 };
@@ -232,7 +296,7 @@ export const clearNotificationHistory = async (): Promise<boolean> => {
   try {
     return await storage.remove(NOTIFICATION_KEYS.NOTIFICATION_HISTORY);
   } catch (error) {
-    console.error('Error clearing notification history:', error);
+    console.error("Error clearing notification history:", error);
     return false;
   }
 };
@@ -242,31 +306,53 @@ export const addScheduledNotification = async (
   scheduledNotification: ScheduledNotification
 ): Promise<boolean> => {
   try {
-    const scheduled = await storage.get<ScheduledNotification[]>(NOTIFICATION_KEYS.SCHEDULED_NOTIFICATIONS) || [];
+    const scheduled =
+      (await storage.get<ScheduledNotification[]>(
+        NOTIFICATION_KEYS.SCHEDULED_NOTIFICATIONS
+      )) || [];
     const updatedScheduled = [...scheduled, scheduledNotification];
-    return await storage.set(NOTIFICATION_KEYS.SCHEDULED_NOTIFICATIONS, updatedScheduled);
+    return await storage.set(
+      NOTIFICATION_KEYS.SCHEDULED_NOTIFICATIONS,
+      updatedScheduled
+    );
   } catch (error) {
-    console.error('Error adding scheduled notification:', error);
+    console.error("Error adding scheduled notification:", error);
     return false;
   }
 };
 
-export const removeScheduledNotification = async (notificationId: string): Promise<boolean> => {
+export const removeScheduledNotification = async (
+  notificationId: string
+): Promise<boolean> => {
   try {
-    const scheduled = await storage.get<ScheduledNotification[]>(NOTIFICATION_KEYS.SCHEDULED_NOTIFICATIONS) || [];
-    const updatedScheduled = scheduled.filter(item => item.id !== notificationId);
-    return await storage.set(NOTIFICATION_KEYS.SCHEDULED_NOTIFICATIONS, updatedScheduled);
+    const scheduled =
+      (await storage.get<ScheduledNotification[]>(
+        NOTIFICATION_KEYS.SCHEDULED_NOTIFICATIONS
+      )) || [];
+    const updatedScheduled = scheduled.filter(
+      (item) => item.id !== notificationId
+    );
+    return await storage.set(
+      NOTIFICATION_KEYS.SCHEDULED_NOTIFICATIONS,
+      updatedScheduled
+    );
   } catch (error) {
-    console.error('Error removing scheduled notification:', error);
+    console.error("Error removing scheduled notification:", error);
     return false;
   }
 };
 
-export const getScheduledNotifications = async (): Promise<ScheduledNotification[]> => {
+export const getScheduledNotifications = async (): Promise<
+  ScheduledNotification[]
+> => {
   try {
-    return await storage.get<ScheduledNotification[]>(NOTIFICATION_KEYS.SCHEDULED_NOTIFICATIONS) || [];
+    return (
+      (await storage.get<ScheduledNotification[]>(
+        NOTIFICATION_KEYS.SCHEDULED_NOTIFICATIONS
+      )) || []
+    );
   } catch (error) {
-    console.error('Error getting scheduled notifications:', error);
+    console.error("Error getting scheduled notifications:", error);
     return [];
   }
 };
@@ -274,16 +360,18 @@ export const getScheduledNotifications = async (): Promise<ScheduledNotification
 // Device helpers
 export const getDeviceInfo = () => {
   return {
-    platform: Device.platformEnum as 'ios' | 'android',
-    modelName: Device.modelName || 'Unknown',
-    osVersion: Device.osVersion || 'Unknown',
+    platform: Device.osName === "iOS" ? "ios" : "android",
+    modelName: Device.modelName || "Unknown",
+    osVersion: Device.osVersion || "Unknown",
     isDevice: Device.isDevice,
   };
 };
 
 // Permission helpers
 export const shouldRequestPermissions = async (): Promise<boolean> => {
-  const lastRequest = await storage.get<number>(NOTIFICATION_KEYS.LAST_PERMISSION_REQUEST);
+  const lastRequest = await storage.get<number>(
+    NOTIFICATION_KEYS.LAST_PERMISSION_REQUEST
+  );
   if (!lastRequest) return true;
 
   const cooldownPeriod = NOTIFICATION_LIMITS.MIN_PERMISSION_REQUEST_COOLDOWN;
@@ -291,11 +379,18 @@ export const shouldRequestPermissions = async (): Promise<boolean> => {
 };
 
 export const setPermissionRequestTimestamp = async (): Promise<boolean> => {
-  return await storage.set(NOTIFICATION_KEYS.LAST_PERMISSION_REQUEST, Date.now());
+  return await storage.set(
+    NOTIFICATION_KEYS.LAST_PERMISSION_REQUEST,
+    Date.now()
+  );
 };
 
 // Error handling helpers
-export const createNotificationError = (message: string, code: string, details?: any) => {
+export const createNotificationError = (
+  message: string,
+  code: string,
+  details?: any
+) => {
   return {
     success: false,
     error: {
@@ -324,31 +419,43 @@ export const logNotificationEvent = (event: string, data?: any) => {
 
 export const logNotificationError = (error: any, context?: string) => {
   if (__DEV__) {
-    console.error(`❌ Notification Error: ${context || 'Unknown'}`, error);
+    console.error(`❌ Notification Error: ${context || "Unknown"}`, error);
   }
 };
 
 // Batch operations helpers
-export const batchMarkAsRead = async (notificationIds: string[]): Promise<boolean> => {
+export const batchMarkAsRead = async (
+  notificationIds: string[]
+): Promise<boolean> => {
   try {
     const history = await getNotificationHistory();
-    const updatedHistory = history.map(item =>
+    const updatedHistory = history.map((item) =>
       notificationIds.includes(item.id) ? { ...item, read: true } : item
     );
-    return await storage.set(NOTIFICATION_KEYS.NOTIFICATION_HISTORY, updatedHistory);
+    return await storage.set(
+      NOTIFICATION_KEYS.NOTIFICATION_HISTORY,
+      updatedHistory
+    );
   } catch (error) {
-    console.error('Error batch marking notifications as read:', error);
+    console.error("Error batch marking notifications as read:", error);
     return false;
   }
 };
 
-export const batchDeleteNotifications = async (notificationIds: string[]): Promise<boolean> => {
+export const batchDeleteNotifications = async (
+  notificationIds: string[]
+): Promise<boolean> => {
   try {
     const history = await getNotificationHistory();
-    const updatedHistory = history.filter(item => !notificationIds.includes(item.id));
-    return await storage.set(NOTIFICATION_KEYS.NOTIFICATION_HISTORY, updatedHistory);
+    const updatedHistory = history.filter(
+      (item) => !notificationIds.includes(item.id)
+    );
+    return await storage.set(
+      NOTIFICATION_KEYS.NOTIFICATION_HISTORY,
+      updatedHistory
+    );
   } catch (error) {
-    console.error('Error batch deleting notifications:', error);
+    console.error("Error batch deleting notifications:", error);
     return false;
   }
 };
@@ -358,8 +465,8 @@ export const getNotificationStats = async () => {
   try {
     const history = await getNotificationHistory();
     const total = history.length;
-    const read = history.filter(item => item.read).length;
-    const interacted = history.filter(item => item.interacted).length;
+    const read = history.filter((item) => item.read).length;
+    const interacted = history.filter((item) => item.interacted).length;
     const unread = total - read;
 
     return {
@@ -371,7 +478,7 @@ export const getNotificationStats = async () => {
       interactionRate: total > 0 ? Math.round((interacted / total) * 100) : 0,
     };
   } catch (error) {
-    console.error('Error getting notification stats:', error);
+    console.error("Error getting notification stats:", error);
     return {
       total: 0,
       read: 0,

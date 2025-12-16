@@ -5,7 +5,12 @@ import { ThemedView } from "./ThemedView";
 import { useTheme } from "@/contexts/AppContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useNotifications } from "@/providers/NotificationProvider";
-import { NotificationPreferences } from "@/types/notifications";
+import {
+  NotificationPreferences,
+  NotificationFrequency,
+} from "@/types/notifications";
+import { SimpleTimePicker } from "./TimePicker";
+import { CompactFrequencySelector } from "./NotificationFrequency";
 
 interface NotificationSettingsItemProps {
   title: string;
@@ -97,29 +102,25 @@ export function QuietHoursSettings({
         <View style={styles.quietHoursDetails}>
           <View style={[styles.timeRow, { borderBottomColor: colors.border }]}>
             <ThemedText style={styles.timeLabel}>From</ThemedText>
-            <TouchableOpacity style={styles.timeButton}>
-              <ThemedText style={[styles.timeValue, { color: colors.primary }]}>
-                {preferences.quietHours.start}
-              </ThemedText>
-              <Ionicons
-                name='chevron-forward'
-                size={16}
-                color={colors.textSecondary}
-              />
-            </TouchableOpacity>
+            <SimpleTimePicker
+              value={preferences.quietHours.start}
+              onChange={(time) =>
+                onPreferencesChange({
+                  quietHours: { ...preferences.quietHours, start: time },
+                })
+              }
+            />
           </View>
           <View style={styles.timeRow}>
             <ThemedText style={styles.timeLabel}>To</ThemedText>
-            <TouchableOpacity style={styles.timeButton}>
-              <ThemedText style={[styles.timeValue, { color: colors.primary }]}>
-                {preferences.quietHours.end}
-              </ThemedText>
-              <Ionicons
-                name='chevron-forward'
-                size={16}
-                color={colors.textSecondary}
-              />
-            </TouchableOpacity>
+            <SimpleTimePicker
+              value={preferences.quietHours.end}
+              onChange={(time) =>
+                onPreferencesChange({
+                  quietHours: { ...preferences.quietHours, end: time },
+                })
+              }
+            />
           </View>
         </View>
       )}
@@ -189,6 +190,14 @@ export function NotificationPreferencesSection({
   const theme = useTheme();
   const colors = theme.colors;
 
+  // Get frequency settings (would be stored separately)
+  const [breakingNewsFrequency, setBreakingNewsFrequency] =
+    React.useState<NotificationFrequency>("realtime");
+  const [newArticlesFrequency, setNewArticlesFrequency] =
+    React.useState<NotificationFrequency>("realtime");
+  const [recommendedFrequency, setRecommendedFrequency] =
+    React.useState<NotificationFrequency>("daily");
+
   return (
     <ThemedView
       style={[styles.section, { backgroundColor: colors.background }]}
@@ -223,6 +232,40 @@ export function NotificationPreferencesSection({
         icon='notifications'
         disabled={!preferences.enabled}
       />
+
+      {/* Frequency Controls */}
+      <View style={styles.frequencySection}>
+        <ThemedText style={styles.frequencyTitle}>
+          Notification Frequency
+        </ThemedText>
+
+        <View style={styles.frequencyItem}>
+          <ThemedText style={styles.frequencyLabel}>Breaking News</ThemedText>
+          <CompactFrequencySelector
+            value={breakingNewsFrequency}
+            onChange={setBreakingNewsFrequency}
+            disabled={!preferences.enabled || !preferences.breakingNews}
+          />
+        </View>
+
+        <View style={styles.frequencyItem}>
+          <ThemedText style={styles.frequencyLabel}>New Articles</ThemedText>
+          <CompactFrequencySelector
+            value={newArticlesFrequency}
+            onChange={setNewArticlesFrequency}
+            disabled={!preferences.enabled || !preferences.newArticles}
+          />
+        </View>
+
+        <View style={styles.frequencyItem}>
+          <ThemedText style={styles.frequencyLabel}>Recommended</ThemedText>
+          <CompactFrequencySelector
+            value={recommendedFrequency}
+            onChange={setRecommendedFrequency}
+            disabled={!preferences.enabled || !preferences.recommendedContent}
+          />
+        </View>
+      </View>
     </ThemedView>
   );
 }
@@ -428,5 +471,22 @@ const styles = StyleSheet.create({
   tokenNote: {
     fontSize: 12,
     lineHeight: 16,
+  },
+  frequencySection: {
+    marginTop: 16,
+  },
+  frequencyTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 12,
+  },
+  frequencyItem: {
+    marginBottom: 12,
+  },
+  frequencyLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginBottom: 8,
+    color: "#666",
   },
 });

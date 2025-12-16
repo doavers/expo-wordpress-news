@@ -300,6 +300,102 @@ export default function SettingsPage() {
           )}
         </View>
 
+        {/* Quick Notification Toggles */}
+        <View style={styles.section}>
+          <ThemedText variant='primary' style={styles.sectionTitle}>
+            Quick Toggles
+          </ThemedText>
+          <View style={styles.quickTogglesContainer}>
+            <TouchableOpacity
+              style={[
+                styles.quickToggle,
+                {
+                  backgroundColor: preferences?.breakingNews
+                    ? themeState.colors.primary
+                    : themeState.colors.card,
+                  borderColor: themeState.colors.border,
+                },
+              ]}
+              onPress={() => {
+                // Toggle breaking news notifications
+                // This would integrate with notification service
+                console.log("Toggle breaking news");
+              }}
+            >
+              <ThemedText
+                style={[
+                  styles.quickToggleText,
+                  {
+                    color: preferences?.breakingNews
+                      ? "white"
+                      : themeState.colors.text,
+                  },
+                ]}
+              >
+                Breaking News
+              </ThemedText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.quickToggle,
+                {
+                  backgroundColor: preferences?.newArticles
+                    ? themeState.colors.primary
+                    : themeState.colors.card,
+                  borderColor: themeState.colors.border,
+                },
+              ]}
+              onPress={() => {
+                // Toggle new article notifications
+                console.log("Toggle new articles");
+              }}
+            >
+              <ThemedText
+                style={[
+                  styles.quickToggleText,
+                  {
+                    color: preferences?.newArticles
+                      ? "white"
+                      : themeState.colors.text,
+                  },
+                ]}
+              >
+                New Articles
+              </ThemedText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.quickToggle,
+                {
+                  backgroundColor: preferences?.recommendedContent
+                    ? themeState.colors.primary
+                    : themeState.colors.card,
+                  borderColor: themeState.colors.border,
+                },
+              ]}
+              onPress={() => {
+                // Toggle recommended content notifications
+                console.log("Toggle recommended content");
+              }}
+            >
+              <ThemedText
+                style={[
+                  styles.quickToggleText,
+                  {
+                    color: preferences?.recommendedContent
+                      ? "white"
+                      : themeState.colors.text,
+                  },
+                ]}
+              >
+                Recommended
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <View style={styles.section}>
           <ThemedText variant='primary' style={styles.sectionTitle}>
             {i18nService.t("settings.dataManagement")}
@@ -326,7 +422,7 @@ export default function SettingsPage() {
             </ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.optionButton}
+            style={[styles.optionButton, styles.resetButton]}
             onPress={resetWelcomeScreen}
           >
             <ThemedText style={styles.optionButtonText}>
@@ -499,6 +595,22 @@ const styles = StyleSheet.create({
   },
   statusValue: {
     fontSize: 16,
+    fontWeight: "600",
+  },
+  quickTogglesContainer: {
+    gap: 12,
+    marginTop: 16,
+  },
+  quickToggle: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: "center",
+  },
+  quickToggleText: {
+    fontSize: 14,
     fontWeight: "600",
   },
 });

@@ -9,6 +9,9 @@ import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { notificationService } from "@/services/notifications";
+import { pushNotificationService } from "@/services/pushNotification";
+import { notificationPreferencesService } from "@/services/notificationPreferences";
 
 // Configure notification handler
 Notifications.setNotificationHandler({
@@ -133,6 +136,10 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
       // Get push token if permissions are granted
       if (status === "granted") {
         await registerForPushNotificationsAsync();
+        // Initialize notification channels
+        await notificationService.initializeChannels();
+        // Sync token with backend
+        await pushNotificationService.syncTokenWithBackend();
       }
 
       // Set up notification listeners
@@ -263,12 +270,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
           sound: "default",
         });
 
-        Notifications.setNotificationChannelAsync("breaking-news", {
-          name: "Breaking News",
-          importance: Notifications.AndroidImportance.HIGH,
-          vibrationPattern: [0, 250, 250, 250],
-          sound: "default",
-        });
+        // Additional channels are now handled by notificationService.initializeChannels()
       }
     } catch (error) {
       console.error("Error registering for push notifications:", error);
@@ -281,6 +283,15 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     const newPreferences = { ...preferences, ...updates };
     setPreferences(newPreferences);
     await savePreferences(newPreferences);
+
+    // Also update using the preferences service
+    try {
+      await notificationPreferencesService.updatePreferences(updates);
+      // Sync with backend
+      await notificationPreferencesService.syncWithBackend();
+    } catch (error) {
+      console.error("Error updating preferences with service:", error);
+    }
   };
 
   const sendLocalNotification = async (
@@ -293,15 +304,8 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     }
 
     try {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title,
-          body,
-          data: data || {},
-          sound: preferences.soundEnabled ? "default" : undefined,
-        },
-        trigger: null, // Show immediately
-      });
+      // Use the notification service instead
+      await notificationService.sendLocalNotification(title, body, data || {});
     } catch (error) {
       console.error("Error sending local notification:", error);
     }
@@ -318,16 +322,13 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     }
 
     try {
-      const notificationId = await Notifications.scheduleNotificationAsync({
-        content: {
-          title,
-          body,
-          data: data || {},
-          sound: preferences.soundEnabled ? "default" : undefined,
-        },
+      // Use the notification service instead
+      return await notificationService.scheduleNotification(
+        title,
+        body,
         trigger,
-      });
-      return notificationId;
+        data || {}
+      );
     } catch (error) {
       console.error("Error scheduling notification:", error);
       return null;
