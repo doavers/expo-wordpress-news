@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { AppProvider } from "@/contexts/AppContext";
+import { NotificationProvider } from "@/providers/NotificationProvider";
 import authService from "@/services/auth";
 import { AuthState } from "@/types/auth";
 
@@ -30,14 +31,24 @@ export default function RootLayout() {
   // Regular app navigation with all routes
   return (
     <AppProvider>
-      <StatusBar style='auto' />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name='index' options={{ headerShown: false }} />
-        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-        <Stack.Screen name='(auth)' options={{ headerShown: false }} />
-        <Stack.Screen name='(protected)' options={{ headerShown: false }} />
-        <Stack.Screen name='about' options={{ headerShown: false }} />
-      </Stack>
+      <NotificationProvider>
+        <StatusBar style='auto' />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name='index' options={{ headerShown: false }} />
+          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+          <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+          <Stack.Screen name='(protected)' options={{ headerShown: false }} />
+          <Stack.Screen name='about' options={{ headerShown: false }} />
+          <Stack.Screen
+            name='notifications'
+            options={{
+              title: "Notifications",
+              headerShown: true,
+              headerBackTitle: "Back",
+            }}
+          />
+        </Stack>
+      </NotificationProvider>
     </AppProvider>
   );
 }

@@ -9,6 +9,7 @@ import {
 import { router } from "expo-router";
 import { ThemedText, ThemedView } from "@/components";
 import { useAppContext } from "@/contexts/AppContext";
+import { useNotifications } from "@/providers/NotificationProvider";
 import { bookmarkService } from "@/services";
 import i18nService from "@/services/i18n";
 import authService from "@/services/auth";
@@ -18,6 +19,7 @@ import { resetFirstLaunch } from "@/utils/welcomeUtils";
 
 export default function SettingsPage() {
   const { themeState, setTheme, setLanguage, language } = useAppContext();
+  const { permissionsGranted, preferences } = useNotifications();
   const [availableLanguages, setAvailableLanguages] = useState(
     i18nService.getAvailableLanguages()
   );
@@ -115,6 +117,26 @@ export default function SettingsPage() {
         },
       ]
     );
+  };
+
+  const handleNotificationSettings = () => {
+    router.push("/notifications/settings");
+  };
+
+  const handleNotificationHistory = () => {
+    router.push("/notifications/history");
+  };
+
+  const getNotificationStatusColor = () => {
+    if (permissionsGranted === null) return themeState.colors.textSecondary;
+    if (permissionsGranted) return "#28a745"; // Green
+    return "#dc3545"; // Red
+  };
+
+  const getNotificationStatusText = () => {
+    if (permissionsGranted === null) return "Loading...";
+    if (permissionsGranted) return "Enabled";
+    return "Disabled";
   };
 
   const getThemeButtonStyle = (selectedTheme: Theme) => {
@@ -241,6 +263,41 @@ export default function SettingsPage() {
               </TouchableOpacity>
             ))}
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <ThemedText variant='primary' style={styles.sectionTitle}>
+            Notifications
+          </ThemedText>
+          <View style={styles.statusContainer}>
+            <ThemedText style={styles.statusLabel}>Status:</ThemedText>
+            <ThemedText
+              style={[
+                styles.statusValue,
+                { color: getNotificationStatusColor() },
+              ]}
+            >
+              {getNotificationStatusText()}
+            </ThemedText>
+          </View>
+          <TouchableOpacity
+            style={styles.optionButton}
+            onPress={handleNotificationSettings}
+          >
+            <ThemedText style={styles.optionButtonText}>
+              Notification Settings
+            </ThemedText>
+          </TouchableOpacity>
+          {permissionsGranted && (
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={handleNotificationHistory}
+            >
+              <ThemedText style={styles.optionButtonText}>
+                Notification History
+              </ThemedText>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -393,6 +450,7 @@ const styles = StyleSheet.create({
   },
   optionButton: {
     flex: 1,
+    marginTop: 10,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -425,5 +483,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     opacity: 0.6,
     marginBottom: 4,
+  },
+  resetButton: {
+    marginTop: 12,
+  },
+  statusContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  statusLabel: {
+    fontSize: 16,
+  },
+  statusValue: {
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
